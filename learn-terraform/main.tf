@@ -1,3 +1,18 @@
+# terraform {
+#   required_providers {
+#     azure = {
+#       source  = "hashicorp/azurerm"
+#       version = "=2.20.0"
+#     }
+#   }
+#   backend "remote" {
+#     organization = "paul-yu"
+#     workspaces {
+#       name = "learn-azure"
+#     }
+#   }
+# }
+
 # Configure the Azure Provider
 provider "azurerm" {
   # whilst the `version` attribute is optional, we recommend pinning to a given version of the Provider
@@ -84,7 +99,7 @@ resource "azurerm_linux_virtual_machine" "vm" {
 
   admin_ssh_key {
     username   = var.admin_username
-    public_key = file("~/.ssh/id_rsa.pub")
+    public_key = var.admin_public_key
   }
 
   os_disk {
@@ -98,8 +113,14 @@ resource "azurerm_linux_virtual_machine" "vm" {
     sku       = "16.04-LTS"
     version   = "latest"
   }
+}
 
-  output "public_ip_address" {
-    value = data.azurerm_public_ip.ip.ip_address
-  }
+data "azurerm_public_ip" "ip" {
+  name                = azurerm_public_ip.publicip.name
+  resource_group_name = azurerm_linux_virtual_machine.vm.resource_group_name
+  depends_on          = [azurerm_linux_virtual_machine.vm]
+}
+
+output "public_ip_address" {
+  value = data.azurerm_public_ip.ip.ip_address
 }

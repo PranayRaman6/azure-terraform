@@ -5,13 +5,18 @@ variable "admin_username" {
   description = "Administrator user name for virtual machine"
 }
 
+variable "admin_public_key" {
+  type        = string
+  description = "Administrator public SSH key"
+}
+
 variable "prefix" {
   type    = string
   default = "my"
 }
 
 variable "tags" {
-  type = "map"
+  type = map
 
   default = {
     Environment = "Terraform GS"
