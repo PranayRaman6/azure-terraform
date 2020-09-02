@@ -5,7 +5,7 @@ terraform {
       version = "=2.20.0"
     }
   }
-
+  
   backend "remote" {
     organization = "pauldotyu"
 
@@ -13,6 +13,11 @@ terraform {
       name = "azure-terraform"
     }
   }
+}
+
+provider "azurerm" {
+  version = "=2.20.0"
+  features {}
 }
 
 data "azurerm_management_group" "prod_root" {
