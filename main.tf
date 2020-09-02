@@ -1,3 +1,20 @@
+terraform {
+  required_providers {
+    azure = {
+      source  = "hashicorp/azurerm"
+      version = "=2.20.0"
+    }
+  }
+  
+  backend "remote" {
+    organization = "pauldotyu"
+
+    workspaces {
+      name = "azure-terraform"
+    }
+  }
+}
+
 provider "azurerm" {
   version = "=2.20.0"
   features {}
