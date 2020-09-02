@@ -5,7 +5,7 @@ terraform {
       version = "=2.20.0"
     }
   }
-  
+
   backend "remote" {
     organization = "pauldotyu"
 
@@ -60,10 +60,10 @@ resource "azurerm_role_definition" "sub_owner" {
   description = "Grants full access to manage all resources, including the ability to assign roles in Azure RBAC except for VPN and ExpressRoute networking resources"
 
   permissions {
-    actions     = ["*"]
+    actions = ["*"]
     not_actions = [
-      "Microsoft.Network/vpnGateways/*", 
-      "Microsoft.Network/expressRouteCircuits/*", 
+      "Microsoft.Network/vpnGateways/*",
+      "Microsoft.Network/expressRouteCircuits/*",
       "Microsoft.Network/vpnSites/*"
     ]
   }
@@ -79,11 +79,11 @@ resource "azurerm_role_definition" "app_owner" {
   description = "Contributor role granted for application/operations team at resource group level"
 
   permissions {
-    actions     = ["*"]
+    actions = ["*"]
     not_actions = [
       "Microsoft.Authorization/*/write",
-      "Microsoft.Network/vpnGateways/*", 
-      "Microsoft.Network/expressRouteCircuits/*", 
+      "Microsoft.Network/vpnGateways/*",
+      "Microsoft.Network/expressRouteCircuits/*",
       "Microsoft.Network/vpnSites/*",
       "Microsoft.Network/routeTables/write",
       "Microsoft.Network/publicIPAddresses/write",
@@ -103,18 +103,18 @@ resource "azurerm_role_definition" "sec_op" {
   description = "Security administrator role with a horizontal view across the entire Azure estate and the Azure Key Vault purge policy"
 
   permissions {
-    actions     = [
-      "*/read", 
+    actions = [
+      "*/read",
       "*/register/action",
       "Microsoft.KeyVault/locations/deletedVaults/purge/action",
       "Microsoft.Insights/alertRules/*",
-      "Microsoft.Authorization/policyDefinitions/*", 
-      "Microsoft.Authorization/policyAssignments/*", 
-      "Microsoft.Authorization/policySetDefinitions/*", 
+      "Microsoft.Authorization/policyDefinitions/*",
+      "Microsoft.Authorization/policyAssignments/*",
+      "Microsoft.Authorization/policySetDefinitions/*",
       "Microsoft.PolicyInsights/*",
       "Microsoft.Security/*"
     ]
-    not_actions = [ ]
+    not_actions = []
   }
 
   assignable_scopes = [ # /subscriptions/00000000-0000-0000-0000-000000000000
@@ -128,8 +128,8 @@ resource "azurerm_role_definition" "net_op" {
   description = "Platform-wide global connectivity management: VNets, UDRs, NSGs, NVAs, VPN, ExpressRoute, and others"
 
   permissions {
-    actions     = [
-      "*/read", 
+    actions = [
+      "*/read",
       "Microsoft.Authorization/*/write",
       "Microsoft.Network/vpnGateways/*",
       "Microsoft.Network/expressRouteCircuits/*",
@@ -137,7 +137,7 @@ resource "azurerm_role_definition" "net_op" {
       "Microsoft.Network/vpnSites/*",
       "Microsoft.Resources/deployments/validate/*"
     ]
-    not_actions = [ ]
+    not_actions = []
   }
 
   assignable_scopes = [ # /subscriptions/00000000-0000-0000-0000-000000000000
