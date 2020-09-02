@@ -4,7 +4,7 @@ provider "azurerm" {
 }
 
 data "azurerm_management_group" "prod_root" {
-  name = "df64cfee-b682-451f-8617-b2466dd17f83"
+  name = var.root
 }
 
 resource "azurerm_management_group" "prod_main" {
