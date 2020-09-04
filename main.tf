@@ -311,16 +311,147 @@ resource "azurerm_policy_set_definition" "main_base_policyset" {
   description           = "Organization's baseline policy set for all deployments in Azure."
   management_group_name = azurerm_management_group.prod_main.name
 
+  metadata = <<METADATA
+    {
+      "version": "1.0.0",
+      "category": "Organizational Policy"
+    }
+  METADATA
+
   parameters = <<PARAMETERS
     {
-        "allowedLocations": {
-            "type": "Array",
-            "metadata": {
-                "description": "The list of allowed locations for resources.",
-                "displayName": "Allowed locations",
-                "strongType": "location"
-            }
-        }
+      "allowedLocations": {
+          "type": "Array",
+          "metadata": {
+              "description": "The list of allowed locations for resources.",
+              "displayName": "Allowed locations",
+              "strongType": "location"
+          }
+      },
+      "tagName1": {
+        "type": "String",
+        "metadata": {
+          "displayName": "PO Number Tag"
+        },
+        "defaultValue": "po-number"
+      },
+      "tagName2": {
+        "type": "String",
+        "metadata": {
+          "displayName": "Environment Tag"
+        },
+        "defaultValue": "environment"
+      },
+      "tagValue2": {
+        "type": "Array",
+        "metadata": {
+          "displayName": "Environment Tag Values",
+          "description": "Approved values for the 'environment' tag, such as 'dev', 'test', 'prod'"
+        },
+        "allowedValues": [
+          "dev",
+          "test",
+          "prod",
+          "other"
+        ],
+        "defaultValue": [
+          "dev",
+          "test",
+          "prod",
+          "other"
+        ]
+      },
+      "tagName3": {
+        "type": "String",
+        "metadata": {
+          "displayName": "Mission Tag"
+        },
+        "defaultValue": "mission"
+      },
+      "tagValue3": {
+        "type": "Array",
+        "metadata": {
+          "displayName": "Mission Tag Values",
+          "description": "Approved values for the 'mission' tag, such as 'academic', 'research', 'administrative', 'mixed'"
+        },
+        "allowedValues": [
+          "academic",
+          "research",
+          "administrative",
+          "mixed"
+        ],
+        "defaultValue": [
+          "academic",
+          "research",
+          "administrative",
+          "mixed"
+        ]
+      },
+      "tagName4": {
+        "type": "String",
+        "metadata": {
+          "displayName": "Protection Level Tag"
+        },
+        "defaultValue": "protection-level"
+      },
+      "tagValue4": {
+        "type": "Array",
+        "metadata": {
+          "displayName": "Protection Level Tag Values",
+          "description": "Approved values for the 'protection-level' tag, such as 'p1', 'p2', 'p3', 'p4'"
+        },
+        "allowedValues": [
+          "p1",
+          "p2",
+          "p3",
+          "p4"
+        ],
+        "defaultValue": [
+          "p1",
+          "p2",
+          "p3",
+          "p4"
+        ]
+      },
+      "tagName5": {
+        "type": "String",
+        "metadata": {
+          "displayName": "Availability Level Tag"
+        },
+        "defaultValue": "availability-level"
+      },
+      "tagValue5": {
+        "type": "Array",
+        "metadata": {
+          "displayName": "Availability Level Tag Values",
+          "description": "Approved values for the 'availability-level' tag, such as 'a1', 'a2', 'a3', 'a4'"
+        },
+        "allowedValues": [
+          "a1",
+          "a2",
+          "a3",
+          "a4"
+        ],
+        "defaultValue": [
+          "a1",
+          "a2",
+          "a3",
+          "a4"
+        ]
+      },
+      "publicBlobStorageEffect": {
+        "type": "String",
+        "metadata": {
+          "description": "The effect determines what happens when the policy rule is evaluated to match",
+          "displayName": "Effect"
+        },
+        "allowedValues": [
+          "Audit",
+          "Deny",
+          "Disabled"
+        ],
+        "defaultValue": "Audit"
+      }
     }
   PARAMETERS
 
@@ -337,6 +468,62 @@ resource "azurerm_policy_set_definition" "main_base_policyset" {
     policy_definition_id = "/providers/Microsoft.Authorization/policyDefinitions/e56962a6-4747-49cd-b67b-bf8b01975c4c"
     parameters = {
       listOfAllowedLocations = "[parameters('allowedLocations')]"
+    }
+  }
+
+  # Required tags for resource groups
+  policy_definition_reference {
+    policy_definition_id = azurerm_policy_definition.main_req_tags.id
+    parameters = {
+      tagName1  = "[parameters('tagName1')]"
+      tagName2  = "[parameters('tagName2')]"
+      tagValue2 = "[parameters('tagValue2')]"
+      tagName3  = "[parameters('tagName3')]"
+      tagValue3 = "[parameters('tagValue3')]"
+      tagName4  = "[parameters('tagName4')]"
+      tagValue4 = "[parameters('tagValue4')]"
+      tagName5  = "[parameters('tagName5')]"
+      tagValue5 = "[parameters('tagValue5')]"
+    }
+  }
+
+  # Inherit a tag from the resource group if missing (po-number)
+  policy_definition_reference {
+    policy_definition_id = "/providers/Microsoft.Authorization/policyDefinitions/ea3f2387-9b95-492a-a190-fcdc54f7b070"
+    parameters = {
+      tagName = "[parameters('tagName1')]"
+    }
+  }
+
+  # Inherit a tag from the resource group if missing (environment)
+  policy_definition_reference {
+    policy_definition_id = "/providers/Microsoft.Authorization/policyDefinitions/ea3f2387-9b95-492a-a190-fcdc54f7b070"
+    parameters = {
+      tagName = "[parameters('tagName2')]"
+    }
+  }
+
+  # Inherit a tag from the resource group if missing (mission)
+  policy_definition_reference {
+    policy_definition_id = "/providers/Microsoft.Authorization/policyDefinitions/ea3f2387-9b95-492a-a190-fcdc54f7b070"
+    parameters = {
+      tagName = "[parameters('tagName3')]"
+    }
+  }
+
+  # Inherit a tag from the resource group if missing (protection-level)
+  policy_definition_reference {
+    policy_definition_id = "/providers/Microsoft.Authorization/policyDefinitions/ea3f2387-9b95-492a-a190-fcdc54f7b070"
+    parameters = {
+      tagName = "[parameters('tagName4')]"
+    }
+  }
+
+  # Inherit a tag from the resource group if missing (availability-level)
+  policy_definition_reference {
+    policy_definition_id = "/providers/Microsoft.Authorization/policyDefinitions/ea3f2387-9b95-492a-a190-fcdc54f7b070"
+    parameters = {
+      tagName = "[parameters('tagName5')]"
     }
   }
 }
