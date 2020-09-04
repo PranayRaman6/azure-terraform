@@ -75,7 +75,6 @@ resource "azurerm_policy_definition" "main_req_tags" {
       "version": "1.0.0",
       "category": "Tags"
     }
-
   METADATA
 
   policy_rule = <<POLICY_RULE
@@ -132,9 +131,7 @@ resource "azurerm_policy_definition" "main_req_tags" {
         "effect": "deny"
       }
     }
-
-    POLICY_RULE
-
+  POLICY_RULE
 
   parameters = <<PARAMETERS
     {
@@ -250,8 +247,7 @@ resource "azurerm_policy_definition" "main_req_tags" {
         ]
       }
     }
-
-    PARAMETERS
+  PARAMETERS
 }
 
 resource "azurerm_policy_definition" "main_no_public_blobs" {
@@ -267,7 +263,6 @@ resource "azurerm_policy_definition" "main_no_public_blobs" {
         "version": "1.0.0",
         "category": "Regulatory Compliance"
     }
-
   METADATA
 
   policy_rule = <<POLICY_RULE
@@ -288,9 +283,7 @@ resource "azurerm_policy_definition" "main_no_public_blobs" {
         "effect": "[parameters('effect')]"
       }
     }
-
-    POLICY_RULE
-
+  POLICY_RULE
 
   parameters = <<PARAMETERS
     {
@@ -308,6 +301,41 @@ resource "azurerm_policy_definition" "main_no_public_blobs" {
         "defaultValue": "Audit"
       }
     }
+  PARAMETERS
+}
 
-    PARAMETERS
+resource "azurerm_policy_set_definition" "main_base_policyset" {
+  name         = "basePolicySet"
+  policy_type  = "Custom"
+  display_name = "Baseline Policy Set"
+  description  = "Organization's baseline policy set for all deployments in Azure."
+
+  parameters = <<PARAMETERS
+    {
+        "allowedLocations": {
+            "type": "Array",
+            "metadata": {
+                "description": "The list of allowed locations for resources.",
+                "displayName": "Allowed locations",
+                "strongType": "location"
+            }
+        }
+    }
+  PARAMETERS
+
+  # Allowed locations for resource groups
+  policy_definition_reference {
+    policy_definition_id = "/providers/Microsoft.Authorization/policyDefinitions/e765b5de-1225-4ba3-bd56-1ac6695af988"
+    parameters = {
+      listOfAllowedLocations = "[parameters('allowedLocations')]"
+    }
+  }
+
+  # Allowed locations for resources
+  policy_definition_reference {
+    policy_definition_id = "/providers/Microsoft.Authorization/policyDefinitions/e56962a6-4747-49cd-b67b-bf8b01975c4c"
+    parameters = {
+      listOfAllowedLocations = "[parameters('allowedLocations')]"
+    }
+  }
 }
