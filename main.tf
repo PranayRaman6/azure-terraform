@@ -32,7 +32,8 @@ resource "azurerm_management_group" "prod_main" {
 resource "azurerm_management_group" "prod_platform" {
   display_name               = "Platform"
   parent_management_group_id = azurerm_management_group.prod_main.id
-  subscription_ids           = [
+
+  subscription_ids = [
     var.prod_platform_sub,
   ]
 }
@@ -40,7 +41,8 @@ resource "azurerm_management_group" "prod_platform" {
 resource "azurerm_management_group" "prod_landingzone" {
   display_name               = "Landing Zone"
   parent_management_group_id = azurerm_management_group.prod_main.id
-  subscription_ids           = [
+
+  subscription_ids = [
     var.prod_landingzone_sub,
   ]
 }
@@ -61,7 +63,7 @@ resource "azurerm_management_group" "prod_quarantine" {
 }
 
 resource "azurerm_policy_definition" "main_req_tags" {
-  name                  = "requiredTagsPolicy"
+  name                  = "requiredResourceGroupTags"
   policy_type           = "Custom"
   mode                  = "All"
   display_name          = "Required tags for resource groups"
