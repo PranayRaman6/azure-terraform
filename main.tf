@@ -61,10 +61,11 @@ resource "azurerm_management_group" "prod_quarantine" {
 }
 
 resource "azurerm_policy_definition" "main_req_tags" {
-  name         = "requiredTagsPolicy"
-  policy_type  = "Custom"
-  mode         = "All"
-  display_name = "Required tags for resource groups"
+  name                  = "requiredTagsPolicy"
+  policy_type           = "Custom"
+  mode                  = "All"
+  display_name          = "Required tags for resource groups"
+  management_group_name = azurerm_management_group.prod_main.name
 
   metadata = <<METADATA
     {
