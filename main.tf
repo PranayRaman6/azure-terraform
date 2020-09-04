@@ -548,4 +548,10 @@ resource "azurerm_policy_assignment" "main_base_policyset_assign" {
       }
     }
   PARAMETERS
+
+  location = "westus2"
+
+  identity {
+    type = "SystemAssigned"
+  }
 }
