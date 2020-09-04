@@ -305,10 +305,10 @@ resource "azurerm_policy_definition" "main_no_public_blobs" {
 }
 
 resource "azurerm_policy_set_definition" "main_base_policyset" {
-  name         = "basePolicySet"
-  policy_type  = "Custom"
-  display_name = "Baseline Policy Set"
-  description  = "Organization's baseline policy set for all deployments in Azure."
+  name                  = "basePolicySet"
+  policy_type           = "Custom"
+  display_name          = "Baseline Policy Set"
+  description           = "Organization's baseline policy set for all deployments in Azure."
   management_group_name = azurerm_management_group.prod_main.name
 
   parameters = <<PARAMETERS
