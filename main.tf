@@ -450,7 +450,7 @@ resource "azurerm_policy_set_definition" "main_base_policyset" {
           "Deny",
           "Disabled"
         ],
-        "defaultValue": "Audit"
+        "defaultValue": "Deny"
       }
     }
   PARAMETERS
@@ -526,4 +526,26 @@ resource "azurerm_policy_set_definition" "main_base_policyset" {
       tagName = "[parameters('tagName5')]"
     }
   }
+}
+
+resource "azurerm_policy_assignment" "main_base_policyset_assign" {
+  name                 = "basePolicySetAssignment"
+  scope                = azurerm_management_group.prod_main.id
+  policy_definition_id = azurerm_policy_set_definition.main_base_policyset.id
+  description          = "Organization policy Assignment for all Azure deployments"
+  display_name         = "Organization policy Assignment"
+
+  metadata = <<METADATA
+    {
+    "category": "General"
+    }
+  METADATA
+
+  parameters = <<PARAMETERS
+    {
+      "allowedLocations": {
+        "value": [ "West US 2", "West Central US" ]
+      }
+    }
+  PARAMETERS
 }
