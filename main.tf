@@ -331,22 +331,22 @@ resource "azurerm_policy_set_definition" "main_base_policyset" {
       "tagName1": {
         "type": "String",
         "metadata": {
-          "displayName": "PO Number Tag"
+          "displayName": "PO number tag name"
         },
         "defaultValue": "po-number"
       },
       "tagName2": {
         "type": "String",
         "metadata": {
-          "displayName": "Environment Tag"
+          "displayName": "Environment tag name"
         },
         "defaultValue": "environment"
       },
       "tagValue2": {
         "type": "Array",
         "metadata": {
-          "displayName": "Environment Tag Values",
-          "description": "Approved values for the 'environment' tag, such as 'dev', 'test', 'prod'"
+          "displayName": "Allowed environment tag values",
+          "description": "Allowed values for the 'environment' tag, such as 'dev', 'test', 'prod'"
         },
         "allowedValues": [
           "dev",
@@ -364,15 +364,15 @@ resource "azurerm_policy_set_definition" "main_base_policyset" {
       "tagName3": {
         "type": "String",
         "metadata": {
-          "displayName": "Mission Tag"
+          "displayName": "Mission tag name"
         },
         "defaultValue": "mission"
       },
       "tagValue3": {
         "type": "Array",
         "metadata": {
-          "displayName": "Mission Tag Values",
-          "description": "Approved values for the 'mission' tag, such as 'academic', 'research', 'administrative', 'mixed'"
+          "displayName": "Allowed mission tag values",
+          "description": "Allowed values for the 'mission' tag, such as 'academic', 'research', 'administrative', 'mixed'"
         },
         "allowedValues": [
           "academic",
@@ -390,15 +390,15 @@ resource "azurerm_policy_set_definition" "main_base_policyset" {
       "tagName4": {
         "type": "String",
         "metadata": {
-          "displayName": "Protection Level Tag"
+          "displayName": "Protection level tag name"
         },
         "defaultValue": "protection-level"
       },
       "tagValue4": {
         "type": "Array",
         "metadata": {
-          "displayName": "Protection Level Tag Values",
-          "description": "Approved values for the 'protection-level' tag, such as 'p1', 'p2', 'p3', 'p4'"
+          "displayName": "Allowed protection level tag values",
+          "description": "Allowed values for the 'protection-level' tag, such as 'p1', 'p2', 'p3', 'p4'"
         },
         "allowedValues": [
           "p1",
@@ -416,15 +416,15 @@ resource "azurerm_policy_set_definition" "main_base_policyset" {
       "tagName5": {
         "type": "String",
         "metadata": {
-          "displayName": "Availability Level Tag"
+          "displayName": "Availability level tag name"
         },
         "defaultValue": "availability-level"
       },
       "tagValue5": {
         "type": "Array",
         "metadata": {
-          "displayName": "Availability Level Tag Values",
-          "description": "Approved values for the 'availability-level' tag, such as 'a1', 'a2', 'a3', 'a4'"
+          "displayName": "Allowed availability level tag values",
+          "description": "Allowed values for the 'availability-level' tag, such as 'a1', 'a2', 'a3', 'a4'"
         },
         "allowedValues": [
           "a1",
@@ -443,7 +443,7 @@ resource "azurerm_policy_set_definition" "main_base_policyset" {
         "type": "String",
         "metadata": {
           "description": "The effect determines what happens when the policy rule is evaluated to match",
-          "displayName": "Effect"
+          "displayName": "Public blob storage policy effect"
         },
         "allowedValues": [
           "Audit",
