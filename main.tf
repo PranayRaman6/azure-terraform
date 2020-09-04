@@ -86,40 +86,40 @@ resource "azurerm_policy_definition" "main_req_tags" {
           {
             "anyOf": [
               {
-                "field": "[[concat('tags[', parameters('tagName1'), ']')]",
+                "field": "[concat('tags[', parameters('tagName1'), ']')]",
                 "exists": "false"
               },
               {
-                "field": "[[concat('tags[', parameters('tagName2'), ']')]",
+                "field": "[concat('tags[', parameters('tagName2'), ']')]",
                 "exists": "false"
               },
               {
-                "field": "[[concat('tags[', parameters('tagName2'), ']')]",
-                "notIn": "[[parameters('tagValue2')]"
+                "field": "[concat('tags[', parameters('tagName2'), ']')]",
+                "notIn": "[parameters('tagValue2')]"
               },
               {
-                "field": "[[concat('tags[', parameters('tagName3'), ']')]",
+                "field": "[concat('tags[', parameters('tagName3'), ']')]",
                 "exists": "false"
               },
               {
-                "field": "[[concat('tags[', parameters('tagName3'), ']')]",
-                "notIn": "[[parameters('tagValue3')]"
+                "field": "[concat('tags[', parameters('tagName3'), ']')]",
+                "notIn": "[parameters('tagValue3')]"
               },
               {
-                "field": "[[concat('tags[', parameters('tagName4'), ']')]",
+                "field": "[concat('tags[', parameters('tagName4'), ']')]",
                 "exists": "false"
               },
               {
-                "field": "[[concat('tags[', parameters('tagName4'), ']')]",
-                "notIn": "[[parameters('tagValue4')]"
+                "field": "[concat('tags[', parameters('tagName4'), ']')]",
+                "notIn": "[parameters('tagValue4')]"
               },
               {
-                "field": "[[concat('tags[', parameters('tagName5'), ']')]",
+                "field": "[concat('tags[', parameters('tagName5'), ']')]",
                 "exists": "false"
               },
               {
-                "field": "[[concat('tags[', parameters('tagName5'), ']')]",
-                "notIn": "[[parameters('tagValue5')]"
+                "field": "[concat('tags[', parameters('tagName5'), ']')]",
+                "notIn": "[parameters('tagValue5')]"
               }
             ]
           }
