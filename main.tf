@@ -309,6 +309,7 @@ resource "azurerm_policy_set_definition" "main_base_policyset" {
   policy_type  = "Custom"
   display_name = "Baseline Policy Set"
   description  = "Organization's baseline policy set for all deployments in Azure."
+  management_group_name = azurerm_management_group.prod_main.name
 
   parameters = <<PARAMETERS
     {
