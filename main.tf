@@ -67,6 +67,7 @@ resource "azurerm_policy_definition" "main_req_tags" {
   policy_type           = "Custom"
   mode                  = "All"
   display_name          = "Required tags for resource groups"
+  description           = "Denies any resource group deployments that do not have the required tags."
   management_group_name = azurerm_management_group.prod_main.name
 
   metadata = <<METADATA
@@ -247,6 +248,64 @@ resource "azurerm_policy_definition" "main_req_tags" {
           "a3",
           "a4"
         ]
+      }
+    }
+
+    PARAMETERS
+}
+
+resource "azurerm_policy_definition" "main_no_public_blobs" {
+  name                  = "noPublicBlobs"
+  policy_type           = "Custom"
+  mode                  = "Indexed"
+  display_name          = "Storage accounts should not allow public Blobs"
+  description           = "Ensure that storage accounts do not allow creation of public Blobs"
+  management_group_name = azurerm_management_group.prod_main.name
+
+  metadata = <<METADATA
+    {
+        "version": "1.0.0",
+        "category": "Regulatory Compliance"
+    }
+
+  METADATA
+
+  policy_rule = <<POLICY_RULE
+    {
+      "if": {
+        "allOf": [
+          {
+            "field": "type",
+            "equals": "Microsoft.Storage/storageAccounts"
+          },
+          {
+            "field": "Microsoft.Storage/storageAccounts/allowBlobPublicAccess",
+            "notEquals": "false"
+          }
+        ]
+      },
+      "then": {
+        "effect": "[parameters('effect')]"
+      }
+    }
+
+    POLICY_RULE
+
+
+  parameters = <<PARAMETERS
+    {
+      "effect": {
+        "type": "String",
+        "metadata": {
+          "displayName": "Effect",
+          "description": "The effect determines what happens when the policy rule is evaluated to match"
+        },
+        "allowedValues": [
+          "Audit",
+          "Deny",
+          "Disabled"
+        ],
+        "defaultValue": "Audit"
       }
     }
 
