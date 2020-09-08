@@ -62,7 +62,7 @@ resource "azurerm_management_group" "prod_quarantine" {
   parent_management_group_id = azurerm_management_group.prod_main.id
 }
 
-resource "azurerm_policy_definition" "main_req_tags" {
+resource "azurerm_policy_definition" "main_req_rg_tags" {
   name                  = "requiredResourceGroupTags"
   policy_type           = "Custom"
   mode                  = "All"
@@ -124,6 +124,186 @@ resource "azurerm_policy_definition" "main_req_tags" {
                 "notIn": "[parameters('tagValue5')]"
               }
             ]
+          }
+        ]
+      },
+      "then": {
+        "effect": "deny"
+      }
+    }
+  POLICY_RULE
+
+  parameters = <<PARAMETERS
+    {
+      "tagName1": {
+        "type": "String",
+        "metadata": {
+          "displayName": "PO Number Tag"
+        },
+        "defaultValue": "po-number"
+      },
+      "tagName2": {
+        "type": "String",
+        "metadata": {
+          "displayName": "Environment Tag"
+        },
+        "defaultValue": "environment"
+      },
+      "tagValue2": {
+        "type": "Array",
+        "metadata": {
+          "displayName": "Environment Tag Values",
+          "description": "Approved values for the 'environment' tag, such as 'dev', 'test', 'prod'"
+        },
+        "allowedValues": [
+          "dev",
+          "test",
+          "prod",
+          "other"
+        ],
+        "defaultValue": [
+          "dev",
+          "test",
+          "prod",
+          "other"
+        ]
+      },
+      "tagName3": {
+        "type": "String",
+        "metadata": {
+          "displayName": "Mission Tag"
+        },
+        "defaultValue": "mission"
+      },
+      "tagValue3": {
+        "type": "Array",
+        "metadata": {
+          "displayName": "Mission Tag Values",
+          "description": "Approved values for the 'mission' tag, such as 'academic', 'research', 'administrative', 'mixed'"
+        },
+        "allowedValues": [
+          "academic",
+          "research",
+          "administrative",
+          "mixed"
+        ],
+        "defaultValue": [
+          "academic",
+          "research",
+          "administrative",
+          "mixed"
+        ]
+      },
+      "tagName4": {
+        "type": "String",
+        "metadata": {
+          "displayName": "Protection Level Tag"
+        },
+        "defaultValue": "protection-level"
+      },
+      "tagValue4": {
+        "type": "Array",
+        "metadata": {
+          "displayName": "Protection Level Tag Values",
+          "description": "Approved values for the 'protection-level' tag, such as 'p1', 'p2', 'p3', 'p4'"
+        },
+        "allowedValues": [
+          "p1",
+          "p2",
+          "p3",
+          "p4"
+        ],
+        "defaultValue": [
+          "p1",
+          "p2",
+          "p3",
+          "p4"
+        ]
+      },
+      "tagName5": {
+        "type": "String",
+        "metadata": {
+          "displayName": "Availability Level Tag"
+        },
+        "defaultValue": "availability-level"
+      },
+      "tagValue5": {
+        "type": "Array",
+        "metadata": {
+          "displayName": "Availability Level Tag Values",
+          "description": "Approved values for the 'availability-level' tag, such as 'a1', 'a2', 'a3', 'a4'"
+        },
+        "allowedValues": [
+          "a1",
+          "a2",
+          "a3",
+          "a4"
+        ],
+        "defaultValue": [
+          "a1",
+          "a2",
+          "a3",
+          "a4"
+        ]
+      }
+    }
+  PARAMETERS
+}
+
+resource "azurerm_policy_definition" "main_req_tags" {
+  name                  = "requiredResourceTags"
+  policy_type           = "Custom"
+  mode                  = "Indexed"
+  display_name          = "Required tags for resources that support tagging"
+  description           = "Denies any resource deployments that do not have the required tags. This only applies to resources that support tagging."
+  management_group_name = azurerm_management_group.prod_main.name
+
+  metadata = <<METADATA
+    {
+      "version": "1.0.0",
+      "category": "Tags"
+    }
+  METADATA
+
+  policy_rule = <<POLICY_RULE
+    {
+      "if": {
+        "anyOf": [
+          {
+            "field": "[concat('tags[', parameters('tagName1'), ']')]",
+            "exists": "false"
+          },
+          {
+            "field": "[concat('tags[', parameters('tagName2'), ']')]",
+            "exists": "false"
+          },
+          {
+            "field": "[concat('tags[', parameters('tagName2'), ']')]",
+            "notIn": "[parameters('tagValue2')]"
+          },
+          {
+            "field": "[concat('tags[', parameters('tagName3'), ']')]",
+            "exists": "false"
+          },
+          {
+            "field": "[concat('tags[', parameters('tagName3'), ']')]",
+            "notIn": "[parameters('tagValue3')]"
+          },
+          {
+            "field": "[concat('tags[', parameters('tagName4'), ']')]",
+            "exists": "false"
+          },
+          {
+            "field": "[concat('tags[', parameters('tagName4'), ']')]",
+            "notIn": "[parameters('tagValue4')]"
+          },
+          {
+            "field": "[concat('tags[', parameters('tagName5'), ']')]",
+            "exists": "false"
+          },
+          {
+            "field": "[concat('tags[', parameters('tagName5'), ']')]",
+            "notIn": "[parameters('tagValue5')]"
           }
         ]
       },
@@ -473,6 +653,22 @@ resource "azurerm_policy_set_definition" "main_base_policyset" {
 
   # Required tags for resource groups
   policy_definition_reference {
+    policy_definition_id = azurerm_policy_definition.main_req_rg_tags.id
+    parameters = {
+      tagName1  = "[parameters('tagName1')]"
+      tagName2  = "[parameters('tagName2')]"
+      tagValue2 = "[parameters('tagValue2')]"
+      tagName3  = "[parameters('tagName3')]"
+      tagValue3 = "[parameters('tagValue3')]"
+      tagName4  = "[parameters('tagName4')]"
+      tagValue4 = "[parameters('tagValue4')]"
+      tagName5  = "[parameters('tagName5')]"
+      tagValue5 = "[parameters('tagValue5')]"
+    }
+  }
+
+  # Required tags for resource groups
+  policy_definition_reference {
     policy_definition_id = azurerm_policy_definition.main_req_tags.id
     parameters = {
       tagName1  = "[parameters('tagName1')]"
@@ -537,14 +733,14 @@ resource "azurerm_policy_assignment" "main_base_policyset_assign" {
 
   metadata = <<METADATA
     {
-    "category": "General"
+      "category": "General"
     }
   METADATA
 
   parameters = <<PARAMETERS
     {
       "allowedLocations": {
-        "value": [ "West US 2", "West Central US" ]
+        "value": [ "West US 2", "West Central US", "Central US", "South Central US" ]
       }
     }
   PARAMETERS
