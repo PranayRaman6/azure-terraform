@@ -669,7 +669,7 @@ resource "azurerm_policy_set_definition" "main_base_policyset" {
 
   # Required tags for resource groups
   policy_definition_reference {
-    policy_definition_id = azurerm_policy_definition.main_req_tags.id
+    policy_definition_id = azurerm_policy_definition.main_req_rg_tags.id
     parameters = {
       tagName1  = "[parameters('tagName1')]"
       tagName2  = "[parameters('tagName2')]"
