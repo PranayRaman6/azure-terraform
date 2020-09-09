@@ -667,22 +667,6 @@ resource "azurerm_policy_set_definition" "main_base_policyset" {
     }
   }
 
-  # Required tags for resource groups
-  policy_definition_reference {
-    policy_definition_id = azurerm_policy_definition.main_req_rg_tags.id
-    parameters = {
-      tagName1  = "[parameters('tagName1')]"
-      tagName2  = "[parameters('tagName2')]"
-      tagValue2 = "[parameters('tagValue2')]"
-      tagName3  = "[parameters('tagName3')]"
-      tagValue3 = "[parameters('tagValue3')]"
-      tagName4  = "[parameters('tagName4')]"
-      tagValue4 = "[parameters('tagValue4')]"
-      tagName5  = "[parameters('tagName5')]"
-      tagValue5 = "[parameters('tagValue5')]"
-    }
-  }
-
   # Required tags for resources
   policy_definition_reference {
     policy_definition_id = azurerm_policy_definition.main_req_tags.id
