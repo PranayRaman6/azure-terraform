@@ -33,9 +33,9 @@ resource "azurerm_management_group" "prod_platform" {
   display_name               = "Platform"
   parent_management_group_id = azurerm_management_group.prod_main.id
 
-  subscription_ids = [
-    var.prod_platform_sub,
-  ]
+  # subscription_ids = [
+  #   var.prod_platform_sub,
+  # ]
 }
 
 resource "azurerm_management_group" "prod_landingzone" {
