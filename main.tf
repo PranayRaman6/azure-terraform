@@ -764,39 +764,39 @@ data "azurerm_policy_set_definition" "prod_policyset_nist" {
   management_group_name = azurerm_management_group.prod_main.name
 }
 
-# resource "azurerm_policy_assignment" "prod_policyset_nist_assign" {
-#   name                 = "nistPolicySetAssignment"
-#   scope                = azurerm_management_group.prod_main.id
-#   policy_definition_id = data.azurerm_policy_set_definition.prod_policyset_nist.id
-#   description          = "Custom NIST SP 800-171 R2 policy assignment for all Azure deployments"
-#   display_name         = "Custom NIST SP 800-171 R2 Policy Assignment"
+resource "azurerm_policy_assignment" "prod_policyset_nist_assign" {
+  name                 = "nistPolicySetAssignment"
+  scope                = azurerm_management_group.prod_main.id
+  policy_definition_id = data.azurerm_policy_set_definition.prod_policyset_nist.id
+  description          = "Custom NIST SP 800-171 R2 policy assignment for all Azure deployments"
+  display_name         = "Custom NIST SP 800-171 R2 Policy Assignment"
 
-#   metadata = <<METADATA
-#     {
-#       "category": "Regulatory Compliance"
-#     }
-#   METADATA
+  metadata = <<METADATA
+    {
+      "category": "Regulatory Compliance"
+    }
+  METADATA
 
-#   parameters = <<PARAMETERS
-#     {
-#       "membersToExcludeInLocalAdministratorsGroup": {
-#         "value": ${var.prod_policyset_nist_assign_exclude}
-#       },
-#       "membersToIncludeInLocalAdministratorsGroup": {
-#         "value": ${var.prod_policyset_nist_assign_include}
-#       },
-#       "listOfLocationsForNetworkWatcher": {
-#         "value": ${var.prod_policyset_nist_assign_network_watcher}
-#       },
-#       "logAnalyticsWorkspaceIDForVMAgents": {
-#         "value": ${var.prod_policyset_nist_assign_log_analytics}
-#       }
-#     }
-#   PARAMETERS
+  parameters = <<PARAMETERS
+    {
+      "membersToExcludeInLocalAdministratorsGroup": {
+        "value": "${var.prod_policyset_nist_assign_exclude}"
+      },
+      "membersToIncludeInLocalAdministratorsGroup": {
+        "value": "${var.prod_policyset_nist_assign_include}"
+      },
+      "listOfLocationsForNetworkWatcher": {
+        "value": ["West US 2", "West Central US", "Central US", "South Central US"]
+      },
+      "logAnalyticsWorkspaceIDForVMAgents": {
+        "value": "${var.prod_policyset_nist_assign_log_analytics}"
+      }
+    }
+  PARAMETERS
 
-#   location = "westus2"
+  location = "westus2"
 
-#   identity {
-#     type = "SystemAssigned"
-#   }
-# }
+  identity {
+    type = "SystemAssigned"
+  }
+}

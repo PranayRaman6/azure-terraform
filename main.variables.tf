@@ -18,7 +18,7 @@ variable "prod_policyset_nist" {
   description = "Policy set name for NIST SP 800-171 R2"
 }
 
-variable "prod_policyset_nist_assign_exlude" {
+variable "prod_policyset_nist_assign_exclude" {
   type        = string
   description = ""
 }
