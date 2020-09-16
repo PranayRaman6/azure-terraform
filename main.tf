@@ -727,7 +727,7 @@ resource "azurerm_policy_assignment" "main_base_policyset_assign" {
   parameters = <<PARAMETERS
     {
       "allowedLocations": {
-        "value": [ "West US 2", "West Central US", "Central US", "South Central US" ]
+        "value": [ "West US 2", "West Central US", "Central US", "South Central US", "East US", "East US 2" ]
       }
     }
   PARAMETERS
@@ -780,3 +780,4 @@ data "azurerm_policy_set_definition" "prod_policyset_nist" {
 #     type = "SystemAssigned"
 #   }
 # }
+
