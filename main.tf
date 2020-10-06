@@ -781,3 +781,32 @@ data "azurerm_policy_set_definition" "prod_policyset_nist" {
 #   }
 # }
 
+resource "azurerm_resource_group" "prod_vwan_rg" {
+  name     = "rg-vwan-01"
+  location = "West US 2"
+}
+
+resource "azurerm_virtual_wan" "prod_vwan_01" {
+  name                           = "vwan-01"
+  resource_group_name            = azurerm_resource_group.prod_vwan_rg.name
+  location                       = azurerm_resource_group.prod_vwan_rg.location
+  allow_branch_to_branch_traffic = true
+  allow_vnet_to_vnet_traffic     = true
+  type                           = "Standard"
+  tags = {
+    "po-number"          = "1234"
+    "environment"        = "dev"
+    "mission"            = "other"
+    "protection-level"   = "p1"
+    "availability-level" = "a1"
+  }
+}
+
+resource "azurerm_virtual_hub" "prod_vhub_westus2" {
+  name                = "vhub-wus2"
+  resource_group_name = azurerm_resource_group.prod_vwan_rg.name
+  location            = azurerm_resource_group.prod_vwan_rg.location
+  virtual_wan_id      = azurerm_virtual_wan.prod_vwan_01.id
+  address_prefix      = "10.0.1.0/24"
+}
+
