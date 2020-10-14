@@ -810,3 +810,9 @@ resource "azurerm_virtual_hub" "prod_vhub_westus2" {
   address_prefix      = "10.0.1.0/24"
 }
 
+resource "azurerm_vpn_gateway" "prod_vhub_vpn_gw" {
+  name                = "vhub-wus2-vpn"
+  location            = azurerm_resource_group.prod_vwan_rg.location
+  resource_group_name = azurerm_resource_group.prod_vwan_rg.name
+  virtual_hub_id      = azurerm_virtual_hub.prod_vhub_westus2.id
+}
