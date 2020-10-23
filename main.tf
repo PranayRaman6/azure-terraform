@@ -13,12 +13,9 @@ module "enterprise_scale" {
   version = "0.0.6-preview"
 
   # Mandatory Variables
-  root_parent_id            = var.tenant_id
+  root_parent_id = var.tenant_id
 
   # Optional Variables
-  root_id                   = "tf"                // Define a custom ID to use for the root Management Group. Also used as a prefix for all core Management Group IDs.
-  root_name                 = "ES Terraform Demo" // Define a custom "friendly name" for the root Management Group
-  deploy_core_landing_zones = false                // Control whether to deploy the default core landing zones // default = true
-  deploy_demo_landing_zones = false               // Control whether to deploy the demo landing zones (default = false)
-  library_path              = "${path.root}/lib"  // Set a path for the custom archetype library path
+  root_id   = "py"                // This string variable is used for the root Management Group ID and as a prefix for all core Management Group IDs
+  root_name = "PY Terraform Demo" // This string variable is used as a friendly name for the root Management Group
 }
