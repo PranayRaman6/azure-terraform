@@ -16,18 +16,18 @@ module "enterprise_scale" {
   root_parent_id = var.tenant_id
 
   # Optional Variables
-  root_id      = "yup"              // This string variable is used for the root Management Group ID and as a prefix for all core Management Group IDs
-  root_name    = "YUP Campus Cloud" // This string variable is used as a friendly name for the root Management Group
-  library_path = "${path.root}/lib" // This string variable is used to define the location of your custom library
+  root_id      = "py"                  // This string variable is used for the root Management Group ID and as a prefix for all core Management Group IDs
+  root_name    = "Paul's Campus Cloud" // This string variable is used as a friendly name for the root Management Group
+  library_path = "${path.root}/lib"    // This string variable is used to define the location of your custom library
 
   custom_landing_zones = {
-    campus-cloud = {
-      display_name               = "YUP Platform"
-      parent_management_group_id = "yup"
+    py-platform = {
+      display_name               = "Paul's Platform"
+      parent_management_group_id = "py"
       subscription_ids           = []
 
       archetype_config = {
-        archetype_id   = "yup_platform"
+        archetype_id   = "py_platform"
         parameters     = {}
         access_control = {}
       }
