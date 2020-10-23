@@ -1,11 +1,4 @@
 terraform {
-  required_providers {
-    azure = {
-      source  = "hashicorp/azurerm"
-      version = "=2.20.0"
-    }
-  }
-
   backend "remote" {
     organization = "pauldotyu"
 
@@ -739,10 +732,10 @@ resource "azurerm_policy_assignment" "main_base_policyset_assign" {
   }
 }
 
-data "azurerm_policy_set_definition" "prod_policyset_nist" {
-  name                  = var.prod_policyset_nist
-  management_group_name = azurerm_management_group.prod_main.name
-}
+# data "azurerm_policy_set_definition" "prod_policyset_nist" {
+#   name                  = var.prod_policyset_nist
+#   management_group_name = azurerm_management_group.prod_main.name
+# }
 
 # resource "azurerm_policy_assignment" "prod_policyset_nist_assign" {
 #   name                 = "nistPolicySetAssignment"
