@@ -9,803 +9,210 @@ terraform {
 }
 
 provider "azurerm" {
-  version = "=2.20.0"
+  version = ">= 2.31.1"
   features {}
 }
 
-data "azurerm_management_group" "prod_root" {
-  name = var.root
+variable "tenant_id" {
+  type        = string
+  description = "The tenant_id is used to set the root_parent_id value for the enterprise_scale module."
 }
 
-resource "azurerm_management_group" "prod_main" {
-  display_name               = "Main"
-  parent_management_group_id = data.azurerm_management_group.prod_root.id
-}
+module "enterprise_scale" {
+  source  = "Azure/caf-enterprise-scale/azurerm"
+  version = "0.0.6-preview"
 
-resource "azurerm_management_group" "prod_platform" {
-  display_name               = "Platform"
-  parent_management_group_id = azurerm_management_group.prod_main.id
+  # Mandatory Variables
+  root_parent_id            = var.tenant_id
 
-  # subscription_ids = [
-  #   var.prod_platform_sub,
-  # ]
-}
+  # Optional Variables
+  root_id                   = "tf"                // Define a custom ID to use for the root Management Group. Also used as a prefix for all core Management Group IDs.
+  root_name                 = "ES Terraform Demo" // Define a custom "friendly name" for the root Management Group
+  deploy_core_landing_zones = true                // Control whether to deploy the default core landing zones // default = true
+  deploy_demo_landing_zones = false               // Control whether to deploy the demo landing zones (default = false)
+  library_path              = "${path.root}/lib"  // Set a path for the custom archetype library path
 
-resource "azurerm_management_group" "prod_landingzone" {
-  display_name               = "Landing Zone"
-  parent_management_group_id = azurerm_management_group.prod_main.id
-
-  subscription_ids = [
-    var.prod_landingzone_sub,
-  ]
-}
-
-resource "azurerm_management_group" "dev_sandbox" {
-  display_name               = "Sandbox"
-  parent_management_group_id = azurerm_management_group.prod_main.id
-}
-
-resource "azurerm_management_group" "prod_legacy" {
-  display_name               = "Legacy"
-  parent_management_group_id = azurerm_management_group.prod_main.id
-}
-
-resource "azurerm_management_group" "prod_quarantine" {
-  display_name               = "Quarantine"
-  parent_management_group_id = azurerm_management_group.prod_main.id
-}
-
-resource "azurerm_policy_definition" "main_req_rg_tags" {
-  name                  = "requiredResourceGroupTags"
-  policy_type           = "Custom"
-  mode                  = "All"
-  display_name          = "Required tags for resource groups"
-  description           = "Denies any resource group deployments that do not have the required tags."
-  management_group_name = azurerm_management_group.prod_main.name
-
-  metadata = <<METADATA
-    {
-      "version": "1.0.0",
-      "category": "Tags"
-    }
-  METADATA
-
-  policy_rule = <<POLICY_RULE
-    {
-      "if": {
-        "allOf": [
-          {
-            "field": "type",
-            "equals": "Microsoft.Resources/subscriptions/resourceGroups"
-          },
-          {
-            "anyOf": [
-              {
-                "field": "[concat('tags[', parameters('tagName1'), ']')]",
-                "exists": "false"
-              },
-              {
-                "field": "[concat('tags[', parameters('tagName2'), ']')]",
-                "exists": "false"
-              },
-              {
-                "field": "[concat('tags[', parameters('tagName2'), ']')]",
-                "notIn": "[parameters('tagValue2')]"
-              },
-              {
-                "field": "[concat('tags[', parameters('tagName3'), ']')]",
-                "exists": "false"
-              },
-              {
-                "field": "[concat('tags[', parameters('tagName3'), ']')]",
-                "notIn": "[parameters('tagValue3')]"
-              },
-              {
-                "field": "[concat('tags[', parameters('tagName4'), ']')]",
-                "exists": "false"
-              },
-              {
-                "field": "[concat('tags[', parameters('tagName4'), ']')]",
-                "notIn": "[parameters('tagValue4')]"
-              },
-              {
-                "field": "[concat('tags[', parameters('tagName5'), ']')]",
-                "exists": "false"
-              },
-              {
-                "field": "[concat('tags[', parameters('tagName5'), ']')]",
-                "notIn": "[parameters('tagValue5')]"
-              }
-            ]
-          }
-        ]
-      },
-      "then": {
-        "effect": "deny"
+  custom_landing_zones = {
+    #------------------------------------------------------#
+    # This variable is used to add new Landing Zones using
+    # the Enterprise-scale deployment model.
+    # Simply add new map items containing the required
+    # attributes, and the Enterprise-scale core module will
+    # take care of the rest.
+    # To associated existing Management Groups which have
+    # been imported using "terraform import ...", please ensure
+    # the key matches the id (Name) of the imported Management
+    # Group and ensure all other values match the existing
+    # configuration.
+    #------------------------------------------------------#
+    customer-web-prod = {
+      display_name               = "Prod Web Applications"
+      parent_management_group_id = "tf-landing-zones"
+      subscription_ids           = []
+      archetype_config = {
+        archetype_id = "customer_online"
+        parameters   = {}
+        access_control = {}
       }
     }
-  POLICY_RULE
-
-  parameters = <<PARAMETERS
-    {
-      "tagName1": {
-        "type": "String",
-        "metadata": {
-          "displayName": "PO Number Tag"
-        },
-        "defaultValue": "po-number"
-      },
-      "tagName2": {
-        "type": "String",
-        "metadata": {
-          "displayName": "Environment Tag"
-        },
-        "defaultValue": "environment"
-      },
-      "tagValue2": {
-        "type": "Array",
-        "metadata": {
-          "displayName": "Environment Tag Values",
-          "description": "Approved values for the 'environment' tag, such as 'dev', 'test', 'prod'"
-        },
-        "allowedValues": [
-          "dev",
-          "test",
-          "prod",
-          "other"
-        ],
-        "defaultValue": [
-          "dev",
-          "test",
-          "prod",
-          "other"
-        ]
-      },
-      "tagName3": {
-        "type": "String",
-        "metadata": {
-          "displayName": "Mission Tag"
-        },
-        "defaultValue": "mission"
-      },
-      "tagValue3": {
-        "type": "Array",
-        "metadata": {
-          "displayName": "Mission Tag Values",
-          "description": "Approved values for the 'mission' tag, such as 'academic', 'research', 'administrative', 'mixed'"
-        },
-        "allowedValues": [
-          "academic",
-          "research",
-          "administrative",
-          "mixed"
-        ],
-        "defaultValue": [
-          "academic",
-          "research",
-          "administrative",
-          "mixed"
-        ]
-      },
-      "tagName4": {
-        "type": "String",
-        "metadata": {
-          "displayName": "Protection Level Tag"
-        },
-        "defaultValue": "protection-level"
-      },
-      "tagValue4": {
-        "type": "Array",
-        "metadata": {
-          "displayName": "Protection Level Tag Values",
-          "description": "Approved values for the 'protection-level' tag, such as 'p1', 'p2', 'p3', 'p4'"
-        },
-        "allowedValues": [
-          "p1",
-          "p2",
-          "p3",
-          "p4"
-        ],
-        "defaultValue": [
-          "p1",
-          "p2",
-          "p3",
-          "p4"
-        ]
-      },
-      "tagName5": {
-        "type": "String",
-        "metadata": {
-          "displayName": "Availability Level Tag"
-        },
-        "defaultValue": "availability-level"
-      },
-      "tagValue5": {
-        "type": "Array",
-        "metadata": {
-          "displayName": "Availability Level Tag Values",
-          "description": "Approved values for the 'availability-level' tag, such as 'a1', 'a2', 'a3', 'a4'"
-        },
-        "allowedValues": [
-          "a1",
-          "a2",
-          "a3",
-          "a4"
-        ],
-        "defaultValue": [
-          "a1",
-          "a2",
-          "a3",
-          "a4"
-        ]
+    customer-web-dev = {
+      display_name               = "Dev Web Applications"
+      parent_management_group_id = "tf-landing-zones"
+      subscription_ids           = []
+      archetype_config = {
+        archetype_id = "customer_online"
+        parameters = {}
+        access_control = {}
       }
     }
-  PARAMETERS
-}
-
-resource "azurerm_policy_definition" "main_req_tags" {
-  name                  = "requiredResourceTags"
-  policy_type           = "Custom"
-  mode                  = "Indexed"
-  display_name          = "Required tags for resources that support tagging"
-  description           = "Denies any resource deployments that do not have the required tags. This only applies to resources that support tagging."
-  management_group_name = azurerm_management_group.prod_main.name
-
-  metadata = <<METADATA
-    {
-      "version": "1.0.0",
-      "category": "Tags"
-    }
-  METADATA
-
-  policy_rule = <<POLICY_RULE
-    {
-      "if": {
-        "anyOf": [
-          {
-            "field": "[concat('tags[', parameters('tagName1'), ']')]",
-            "exists": "false"
-          },
-          {
-            "field": "[concat('tags[', parameters('tagName2'), ']')]",
-            "exists": "false"
-          },
-          {
-            "field": "[concat('tags[', parameters('tagName2'), ']')]",
-            "notIn": "[parameters('tagValue2')]"
-          },
-          {
-            "field": "[concat('tags[', parameters('tagName3'), ']')]",
-            "exists": "false"
-          },
-          {
-            "field": "[concat('tags[', parameters('tagName3'), ']')]",
-            "notIn": "[parameters('tagValue3')]"
-          },
-          {
-            "field": "[concat('tags[', parameters('tagName4'), ']')]",
-            "exists": "false"
-          },
-          {
-            "field": "[concat('tags[', parameters('tagName4'), ']')]",
-            "notIn": "[parameters('tagValue4')]"
-          },
-          {
-            "field": "[concat('tags[', parameters('tagName5'), ']')]",
-            "exists": "false"
-          },
-          {
-            "field": "[concat('tags[', parameters('tagName5'), ']')]",
-            "notIn": "[parameters('tagValue5')]"
-          }
-        ]
-      },
-      "then": {
-        "effect": "deny"
-      }
-    }
-  POLICY_RULE
-
-  parameters = <<PARAMETERS
-    {
-      "tagName1": {
-        "type": "String",
-        "metadata": {
-          "displayName": "PO Number Tag"
-        },
-        "defaultValue": "po-number"
-      },
-      "tagName2": {
-        "type": "String",
-        "metadata": {
-          "displayName": "Environment Tag"
-        },
-        "defaultValue": "environment"
-      },
-      "tagValue2": {
-        "type": "Array",
-        "metadata": {
-          "displayName": "Environment Tag Values",
-          "description": "Approved values for the 'environment' tag, such as 'dev', 'test', 'prod'"
-        },
-        "allowedValues": [
-          "dev",
-          "test",
-          "prod",
-          "other"
-        ],
-        "defaultValue": [
-          "dev",
-          "test",
-          "prod",
-          "other"
-        ]
-      },
-      "tagName3": {
-        "type": "String",
-        "metadata": {
-          "displayName": "Mission Tag"
-        },
-        "defaultValue": "mission"
-      },
-      "tagValue3": {
-        "type": "Array",
-        "metadata": {
-          "displayName": "Mission Tag Values",
-          "description": "Approved values for the 'mission' tag, such as 'academic', 'research', 'administrative', 'mixed'"
-        },
-        "allowedValues": [
-          "academic",
-          "research",
-          "administrative",
-          "mixed"
-        ],
-        "defaultValue": [
-          "academic",
-          "research",
-          "administrative",
-          "mixed"
-        ]
-      },
-      "tagName4": {
-        "type": "String",
-        "metadata": {
-          "displayName": "Protection Level Tag"
-        },
-        "defaultValue": "protection-level"
-      },
-      "tagValue4": {
-        "type": "Array",
-        "metadata": {
-          "displayName": "Protection Level Tag Values",
-          "description": "Approved values for the 'protection-level' tag, such as 'p1', 'p2', 'p3', 'p4'"
-        },
-        "allowedValues": [
-          "p1",
-          "p2",
-          "p3",
-          "p4"
-        ],
-        "defaultValue": [
-          "p1",
-          "p2",
-          "p3",
-          "p4"
-        ]
-      },
-      "tagName5": {
-        "type": "String",
-        "metadata": {
-          "displayName": "Availability Level Tag"
-        },
-        "defaultValue": "availability-level"
-      },
-      "tagValue5": {
-        "type": "Array",
-        "metadata": {
-          "displayName": "Availability Level Tag Values",
-          "description": "Approved values for the 'availability-level' tag, such as 'a1', 'a2', 'a3', 'a4'"
-        },
-        "allowedValues": [
-          "a1",
-          "a2",
-          "a3",
-          "a4"
-        ],
-        "defaultValue": [
-          "a1",
-          "a2",
-          "a3",
-          "a4"
-        ]
-      }
-    }
-  PARAMETERS
-}
-
-resource "azurerm_policy_definition" "main_no_public_blobs" {
-  name                  = "noPublicBlobs"
-  policy_type           = "Custom"
-  mode                  = "Indexed"
-  display_name          = "Storage accounts should not allow public Blobs"
-  description           = "Ensure that storage accounts do not allow creation of public Blobs"
-  management_group_name = azurerm_management_group.prod_main.name
-
-  metadata = <<METADATA
-    {
-        "version": "1.0.0",
-        "category": "Regulatory Compliance"
-    }
-  METADATA
-
-  policy_rule = <<POLICY_RULE
-    {
-      "if": {
-        "allOf": [
-          {
-            "field": "type",
-            "equals": "Microsoft.Storage/storageAccounts"
-          },
-          {
-            "field": "Microsoft.Storage/storageAccounts/allowBlobPublicAccess",
-            "notEquals": "false"
-          }
-        ]
-      },
-      "then": {
-        "effect": "[parameters('effect')]"
-      }
-    }
-  POLICY_RULE
-
-  parameters = <<PARAMETERS
-    {
-      "effect": {
-        "type": "String",
-        "metadata": {
-          "displayName": "Effect",
-          "description": "The effect determines what happens when the policy rule is evaluated to match"
-        },
-        "allowedValues": [
-          "Audit",
-          "Deny",
-          "Disabled"
-        ],
-        "defaultValue": "Audit"
-      }
-    }
-  PARAMETERS
-}
-
-resource "azurerm_policy_set_definition" "main_base_policyset" {
-  name                  = "basePolicySet"
-  policy_type           = "Custom"
-  display_name          = "Organization Policy Set"
-  description           = "Organization's baseline policy set for all deployments in Azure."
-  management_group_name = azurerm_management_group.prod_main.name
-
-  metadata = <<METADATA
-    {
-      "version": "1.0.0",
-      "category": "Organizational Policy"
-    }
-  METADATA
-
-  parameters = <<PARAMETERS
-    {
-      "allowedLocations": {
-          "type": "Array",
-          "metadata": {
-              "description": "The list of allowed locations for resources.",
-              "displayName": "Allowed locations",
-              "strongType": "location"
-          }
-      },
-      "tagName1": {
-        "type": "String",
-        "metadata": {
-          "displayName": "PO number tag name"
-        },
-        "defaultValue": "po-number"
-      },
-      "tagName2": {
-        "type": "String",
-        "metadata": {
-          "displayName": "Environment tag name"
-        },
-        "defaultValue": "environment"
-      },
-      "tagValue2": {
-        "type": "Array",
-        "metadata": {
-          "displayName": "Allowed environment tag values",
-          "description": "Allowed values for the 'environment' tag, such as 'dev', 'test', 'prod'"
-        },
-        "allowedValues": [
-          "dev",
-          "test",
-          "prod",
-          "other"
-        ],
-        "defaultValue": [
-          "dev",
-          "test",
-          "prod",
-          "other"
-        ]
-      },
-      "tagName3": {
-        "type": "String",
-        "metadata": {
-          "displayName": "Mission tag name"
-        },
-        "defaultValue": "mission"
-      },
-      "tagValue3": {
-        "type": "Array",
-        "metadata": {
-          "displayName": "Allowed mission tag values",
-          "description": "Allowed values for the 'mission' tag, such as 'academic', 'research', 'administrative', 'mixed'"
-        },
-        "allowedValues": [
-          "academic",
-          "research",
-          "administrative",
-          "mixed"
-        ],
-        "defaultValue": [
-          "academic",
-          "research",
-          "administrative",
-          "mixed"
-        ]
-      },
-      "tagName4": {
-        "type": "String",
-        "metadata": {
-          "displayName": "Protection level tag name"
-        },
-        "defaultValue": "protection-level"
-      },
-      "tagValue4": {
-        "type": "Array",
-        "metadata": {
-          "displayName": "Allowed protection level tag values",
-          "description": "Allowed values for the 'protection-level' tag, such as 'p1', 'p2', 'p3', 'p4'"
-        },
-        "allowedValues": [
-          "p1",
-          "p2",
-          "p3",
-          "p4"
-        ],
-        "defaultValue": [
-          "p1",
-          "p2",
-          "p3",
-          "p4"
-        ]
-      },
-      "tagName5": {
-        "type": "String",
-        "metadata": {
-          "displayName": "Availability level tag name"
-        },
-        "defaultValue": "availability-level"
-      },
-      "tagValue5": {
-        "type": "Array",
-        "metadata": {
-          "displayName": "Allowed availability level tag values",
-          "description": "Allowed values for the 'availability-level' tag, such as 'a1', 'a2', 'a3', 'a4'"
-        },
-        "allowedValues": [
-          "a1",
-          "a2",
-          "a3",
-          "a4"
-        ],
-        "defaultValue": [
-          "a1",
-          "a2",
-          "a3",
-          "a4"
-        ]
-      }
-    }
-  PARAMETERS
-
-  # Allowed locations for resource groups
-  policy_definition_reference {
-    policy_definition_id = "/providers/Microsoft.Authorization/policyDefinitions/e765b5de-1225-4ba3-bd56-1ac6695af988"
-    parameters = {
-      listOfAllowedLocations = "[parameters('allowedLocations')]"
-    }
+    #------------------------------------------------------#
+    # EXAMPLES
+    #------------------------------------------------------#
+    # example-mg = {
+    #   display_name               = "Example Management Group"
+    #   parent_management_group_id = "es-landing-zones"
+    #   subscription_ids           = [
+    #     "3117d098-8b43-433b-849d-b761742eb717",
+    #   ]
+    #   archetype_config = {
+    #     archetype_id = "es_landing_zones"
+    #     parameters = {
+    #       policy_assignment_id = {
+    #         param_name_1 = param_value_1
+    #         param_name_2 = param_value_2
+    #         param_name_3 = param_value_3
+    #       }
+    #     }
+    #     access_control = {
+    #       role_definition_name = {
+    #         "member_1_object_id",
+    #         "member_2_object_id",
+    #         "member_3_object_id",
+    #       }
+    #     }
+    #   }
+    # }
+    #------------------------------------------------------#
   }
 
-  # Allowed locations for resources
-  policy_definition_reference {
-    policy_definition_id = "/providers/Microsoft.Authorization/policyDefinitions/e56962a6-4747-49cd-b67b-bf8b01975c4c"
-    parameters = {
-      listOfAllowedLocations = "[parameters('allowedLocations')]"
-    }
+  # The following var provides an example for how to specify
+  # custom archetypes for the connectivity Landing Zones
+  archetype_config_overrides = {
+    #------------------------------------------------------#
+    # This variable is used to configure the built-in
+    # Enterprise-scale Management Groups with alternate
+    # (or custom) name and parameters.
+    # Simply uncomment the one(s) you want to modify and
+    # provide the required values.
+    #------------------------------------------------------#
+    # root = {
+    #   archetype_id   = "es_root"
+    #   parameters     = {}
+    #   access_control = {}
+    # }
+    # decommissioned = {
+    #   archetype_id   = "es_decommissioned"
+    #   parameters     = {}
+    #   access_control = {}
+    # }
+    # sandboxes = {
+    #   archetype_id   = "es_sandboxes"
+    #   parameters     = {}
+    #   access_control = {}
+    # }
+    # landing_zones = {
+    #   archetype_id   = "es_landing_zones"
+    #   parameters     = {}
+    #   access_control = {}
+    # }
+    # platform = {
+    #   archetype_id   = "es_platform"
+    #   parameters     = {}
+    #   access_control = {}
+    # }
+    # connectivity = {
+    #   archetype_id   = "es_connectivity_foundation"
+    #   parameters     = {}
+    #   access_control = {}
+    # }
+    # management = {
+    #   archetype_id   = "es_management"
+    #   parameters     = {}
+    #   access_control = {}
+    # }
+    # identity = {
+    #   archetype_id   = "es_identity"
+    #   parameters     = {}
+    #   access_control = {}
+    # }
+    # demo_corp = {
+    #   archetype_id   = "es_demo_corp"
+    #   parameters     = {}
+    #   access_control = {}
+    # }
+    # demo_online = {
+    #   archetype_id   = "es_demo_online"
+    #   parameters     = {}
+    #   access_control = {}
+    # }
+    # demo_sap = {
+    #   archetype_id   = "es_demo_sap"
+    #   parameters     = {}
+    #   access_control = {}
+    # }
+    #------------------------------------------------------#
+    # EXAMPLES
+    #------------------------------------------------------#
+    # connectivity = {
+    #   archetype_id = "es_connectivity_vwan"
+    #   parameters = {
+    #     policy_assignment_id = {
+    #       param_name_1 = param_value_1
+    #       param_name_2 = param_value_2
+    #       param_name_3 = param_value_3
+    #     }
+    #   }
+    #   access_control = {
+    #     role_definition_name = {
+    #       "member_1_object_id",
+    #       "member_2_object_id",
+    #       "member_3_object_id",
+    #     }
+    #   }
+    # }
+    #------------------------------------------------------#
   }
 
-  # Required tags for resource groups
-  policy_definition_reference {
-    policy_definition_id = azurerm_policy_definition.main_req_rg_tags.id
-    parameters = {
-      tagName1  = "[parameters('tagName1')]"
-      tagName2  = "[parameters('tagName2')]"
-      tagValue2 = "[parameters('tagValue2')]"
-      tagName3  = "[parameters('tagName3')]"
-      tagValue3 = "[parameters('tagValue3')]"
-      tagName4  = "[parameters('tagName4')]"
-      tagValue4 = "[parameters('tagValue4')]"
-      tagName5  = "[parameters('tagName5')]"
-      tagValue5 = "[parameters('tagValue5')]"
-    }
+  subscription_id_overrides = {
+    #------------------------------------------------------#
+    # This variable is used to associate Azure subscription_ids
+    # with the built-in Enterprise-scale Management Groups.
+    # Simply add one or more Subscription IDs to any of the
+    # built-in Management Groups listed below as required.
+    #------------------------------------------------------#
+    root           = []
+    decommissioned = []
+    sandboxes      = []
+    landing-zones  = []
+    platform       = []
+    connectivity   = []
+    management     = []
+    identity       = []
+    demo-corp      = []
+    demo-online    = []
+    demo-sap       = []
+    #------------------------------------------------------#
+    # EXAMPLES
+    #------------------------------------------------------#
+    # connectivity = [
+    #   "3117d098-8b43-433b-849d-b761742eb717",
+    # ]
+    # management = [
+    #   "9ee716a9-e411-433a-86ea-d82bf7b7ca61",
+    # ]
+    # identity = [
+    #   "cae4c823-f353-4a34-a91a-acc5a0bd65c7",
+    # ]
+    #------------------------------------------------------#
   }
-
-  # Required tags for resources
-  policy_definition_reference {
-    policy_definition_id = azurerm_policy_definition.main_req_tags.id
-    parameters = {
-      tagName1  = "[parameters('tagName1')]"
-      tagName2  = "[parameters('tagName2')]"
-      tagValue2 = "[parameters('tagValue2')]"
-      tagName3  = "[parameters('tagName3')]"
-      tagValue3 = "[parameters('tagValue3')]"
-      tagName4  = "[parameters('tagName4')]"
-      tagValue4 = "[parameters('tagValue4')]"
-      tagName5  = "[parameters('tagName5')]"
-      tagValue5 = "[parameters('tagValue5')]"
-    }
-  }
-
-  # Inherit a tag from the resource group if missing (po-number)
-  policy_definition_reference {
-    policy_definition_id = "/providers/Microsoft.Authorization/policyDefinitions/ea3f2387-9b95-492a-a190-fcdc54f7b070"
-    parameters = {
-      tagName = "[parameters('tagName1')]"
-    }
-  }
-
-  # Inherit a tag from the resource group if missing (environment)
-  policy_definition_reference {
-    policy_definition_id = "/providers/Microsoft.Authorization/policyDefinitions/ea3f2387-9b95-492a-a190-fcdc54f7b070"
-    parameters = {
-      tagName = "[parameters('tagName2')]"
-    }
-  }
-
-  # Inherit a tag from the resource group if missing (mission)
-  policy_definition_reference {
-    policy_definition_id = "/providers/Microsoft.Authorization/policyDefinitions/ea3f2387-9b95-492a-a190-fcdc54f7b070"
-    parameters = {
-      tagName = "[parameters('tagName3')]"
-    }
-  }
-
-  # Inherit a tag from the resource group if missing (protection-level)
-  policy_definition_reference {
-    policy_definition_id = "/providers/Microsoft.Authorization/policyDefinitions/ea3f2387-9b95-492a-a190-fcdc54f7b070"
-    parameters = {
-      tagName = "[parameters('tagName4')]"
-    }
-  }
-
-  # Inherit a tag from the resource group if missing (availability-level)
-  policy_definition_reference {
-    policy_definition_id = "/providers/Microsoft.Authorization/policyDefinitions/ea3f2387-9b95-492a-a190-fcdc54f7b070"
-    parameters = {
-      tagName = "[parameters('tagName5')]"
-    }
-  }
-}
-
-resource "azurerm_policy_assignment" "main_base_policyset_assign" {
-  name                 = "basePolicySetAssignment"
-  scope                = azurerm_management_group.prod_main.id
-  policy_definition_id = azurerm_policy_set_definition.main_base_policyset.id
-  description          = "Organization policy Assignment for all Azure deployments"
-  display_name         = "Organization policy Assignment"
-
-  metadata = <<METADATA
-    {
-      "category": "General"
-    }
-  METADATA
-
-  parameters = <<PARAMETERS
-    {
-      "allowedLocations": {
-        "value": [ "West US 2", "West Central US", "Central US", "South Central US", "East US", "East US 2" ]
-      }
-    }
-  PARAMETERS
-
-  location = "westus2"
-
-  identity {
-    type = "SystemAssigned"
-  }
-}
-
-# data "azurerm_policy_set_definition" "prod_policyset_nist" {
-#   name                  = var.prod_policyset_nist
-#   management_group_name = azurerm_management_group.prod_main.name
-# }
-
-# resource "azurerm_policy_assignment" "prod_policyset_nist_assign" {
-#   name                 = "nistPolicySetAssignment"
-#   scope                = azurerm_management_group.prod_main.id
-#   policy_definition_id = data.azurerm_policy_set_definition.prod_policyset_nist.id
-#   description          = "Custom NIST SP 800-171 R2 policy assignment for all Azure deployments"
-#   display_name         = "Custom NIST SP 800-171 R2 Policy Assignment"
-
-#   metadata = <<METADATA
-#     {
-#       "category": "Regulatory Compliance"
-#     }
-#   METADATA
-
-#   parameters = <<PARAMETERS
-#     {
-#       "membersToExcludeInLocalAdministratorsGroup": {
-#         "value": "${var.prod_policyset_nist_assign_exclude}"
-#       },
-#       "membersToIncludeInLocalAdministratorsGroup": {
-#         "value": "${var.prod_policyset_nist_assign_include}"
-#       },
-#       "listOfLocationsForNetworkWatcher": {
-#         "value": ["West US 2", "West Central US", "Central US", "South Central US"]
-#       },
-#       "logAnalyticsWorkspaceIDForVMAgents": {
-#         "value": "${var.prod_policyset_nist_assign_log_analytics}"
-#       }
-#     }
-#   PARAMETERS
-
-#   location = "westus2"
-
-#   identity {
-#     type = "SystemAssigned"
-#   }
-# }
-
-resource "azurerm_resource_group" "prod_vwan_rg" {
-  name     = "rg-vwan-01"
-  location = "West US 2"
-}
-
-resource "azurerm_virtual_wan" "prod_vwan_01" {
-  name                           = "vwan-01"
-  resource_group_name            = azurerm_resource_group.prod_vwan_rg.name
-  location                       = azurerm_resource_group.prod_vwan_rg.location
-  allow_branch_to_branch_traffic = true
-  allow_vnet_to_vnet_traffic     = true
-  type                           = "Standard"
-  tags = {
-    "po-number"          = "1234"
-    "environment"        = "dev"
-    "mission"            = "other"
-    "protection-level"   = "p1"
-    "availability-level" = "a1"
-  }
-}
-
-resource "azurerm_virtual_hub" "prod_vhub_westus2" {
-  name                = "vhub-wus2"
-  resource_group_name = azurerm_resource_group.prod_vwan_rg.name
-  location            = azurerm_resource_group.prod_vwan_rg.location
-  virtual_wan_id      = azurerm_virtual_wan.prod_vwan_01.id
-  address_prefix      = "10.0.1.0/24"
-}
-
-resource "azurerm_vpn_gateway" "prod_vhub_vpn_gw" {
-  name                = "vhub-wus2-vpn"
-  location            = azurerm_resource_group.prod_vwan_rg.location
-  resource_group_name = azurerm_resource_group.prod_vwan_rg.name
-  virtual_hub_id      = azurerm_virtual_hub.prod_vhub_westus2.id
 }
