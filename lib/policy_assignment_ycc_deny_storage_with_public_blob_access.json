@@ -1,0 +1,21 @@
+{
+  "name": "YCC-Deny-Public-Blobs",
+  "type": "Microsoft.Authorization/policyAssignments",
+  "apiVersion": "2019-09-01",
+  "properties": {
+    "description": "Storage accounts should not allow public Blobs",
+    "displayName": "YCC-Audit-Storage-With-Public-Blob-Access",
+    "notScopes": [],
+    "parameters": {
+      "effect": {
+        "value": "Deny"
+      }
+    },
+    "policyDefinitionId": "${root_scope_resource_id}/providers/Microsoft.Authorization/policyDefinitions/YCC-Audit-Storage-With-Public-Blob-Access",
+    "scope": "${current_scope_resource_id}"
+  },
+  "location": "${default_location}",
+  "identity": {
+    "type": "None"
+  }
+}
