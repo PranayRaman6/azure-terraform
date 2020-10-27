@@ -13,7 +13,7 @@
     - ARM_TENANT_ID
     - ARM_SUBSCRIPTION_ID
 
-1. In Azure Portal, locate the Id of your tenant root group and add it as a variable named `root` in Terraform Cloud workspace
+1. In Azure Portal, locate the Id of your tenant root group and add it as a variable named `tenant_id` in Terraform Cloud workspace
 
 1. Download and install the [Terraform CLI](https://learn.hashicorp.com/tutorials/terraform/install-cli)
 
@@ -39,3 +39,5 @@
 ## Use this doc and get your Terraform on!
 
 https://www.terraform.io/docs/providers/azurerm/
+https://registry.terraform.io/modules/Azure/caf-enterprise-scale/azurerm/latest
+https://github.com/Azure/terraform-azurerm-caf-enterprise-scale
