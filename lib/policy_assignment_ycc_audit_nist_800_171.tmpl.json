@@ -1,0 +1,37 @@
+{
+  "name": "YCC-Audit-NIST-800-171",
+  "type": "Microsoft.Authorization/policyAssignments",
+  "apiVersion": "2019-09-01",
+  "properties": {
+    "description": "This custom initiative includes audit and virtual machine extension policies that address a subset of NIST SP 800-171 R2 requirements. Additional policies will be added in upcoming releases. For more information, visit https://aka.ms/nist800171r2-blueprint.",
+    "displayName": "YCC-Audit-NIST-800-171",
+    "notScopes": [],
+    "parameters": {
+      "membersToExcludeInLocalAdministratorsGroup": {
+        "value": "nonadmin"
+      },
+      "membersToIncludeInLocalAdministratorsGroup": {
+        "value": "admin"
+      },
+      "listOfLocationsForNetworkWatcher": {
+        "value": [
+          "westus2",
+          "westcentralus"
+        ]
+      },
+      "logAnalyticsWorkspaceIDForVMAgents": {
+        "value": "<<VALUE_NEEDED>>"
+      }
+    },
+    "policyDefinitionId": "${root_scope_resource_id}/providers/Microsoft.Authorization/policySetDefinitions/YCC-Audit-NIST-800-171",
+    "scope": "${current_scope_resource_id}"
+  },
+  "sku": {
+    "name": "A0",
+    "tier": "Free"
+  },
+  "location": "${default_location}",
+  "identity": {
+    "type": "SystemAssigned"
+  }
+}
