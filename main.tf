@@ -84,8 +84,8 @@ module "enterprise_scale" {
       subscription_ids           = var.secure_research_subscriptions
 
       archetype_config = {
-        archetype_id   = "ycc_secure_research"
-        parameters     = {
+        archetype_id = "ycc_secure_research"
+        parameters = {
           YCC-Audit-NIST-800-171 = {
             logAnalyticsWorkspaceIDForVMAgents = "d6496211-ccd8-406a-9125-5b910da8a301"
           }

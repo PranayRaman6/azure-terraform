@@ -4,11 +4,11 @@ variable "tenant_id" {
 }
 
 variable "management_subscriptions" {
-  type = list
+  type        = list
   description = "List of subscriptions to be nested under Management MG"
 }
 
 variable "secure_research_subscriptions" {
-  type = list
+  type        = list
   description = "List of subscriptions to be nested under Secure Research MG"
 }
