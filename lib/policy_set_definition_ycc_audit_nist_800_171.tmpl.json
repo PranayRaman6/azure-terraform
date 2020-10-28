@@ -12,21 +12,21 @@
     },
     "parameters": {
       "membersToExcludeInLocalAdministratorsGroup": {
-        "type": "string",
+        "type": "String",
         "metadata": {
           "displayName": "List of users excluded from Windows VM Administrators group",
           "description": "A semicolon-separated list of users that should be excluded in the Administrators local group; Ex: Administrator; myUser1; myUser2"
         }
       },
       "membersToIncludeInLocalAdministratorsGroup": {
-        "type": "string",
+        "type": "String",
         "metadata": {
           "displayName": "List of users that must be included in Windows VM Administrators group",
           "description": "A semicolon-separated list of users that should be included in the Administrators local group; Ex: Administrator; myUser1; myUser2"
         }
       },
       "listOfLocationsForNetworkWatcher": {
-        "type": "array",
+        "type": "Array",
         "metadata": {
           "displayName": "List of regions where Network Watcher should be enabled",
           "description": "Audit if Network Watcher is not enabled for region(s).",
@@ -34,14 +34,14 @@
         }
       },
       "logAnalyticsWorkspaceIDForVMAgents": {
-        "type": "string",
+        "type": "String",
         "metadata": {
           "displayName": "Log Analytics workspace ID for VM agent reporting",
           "description": "ID (GUID) of the Log Analytics workspace where VMs agents should report."
         }
       },
       "pHPLatestVersionForAppServices": {
-        "type": "string",
+        "type": "String",
         "defaultValue": "7.3",
         "metadata": {
           "displayName": "Latest PHP version",
@@ -49,7 +49,7 @@
         }
       },
       "windowsImagesToAddToLogAgentAuditScope": {
-        "type": "array",
+        "type": "Array",
         "metadata": {
           "displayName": "Optional: List of Windows VM images that support Log Analytics agent to add to audit scope",
           "description": "A semicolon-separated list of images; Ex: /subscriptions/<subscriptionId>/resourceGroups/YourResourceGroup/providers/Microsoft.Compute/images/ContosoStdImage"
@@ -57,7 +57,7 @@
         "defaultValue": []
       },
       "linuxImagesToAddToLogAgentAuditScope": {
-        "type": "array",
+        "type": "Array",
         "metadata": {
           "displayName": "Optional: List of Linux VM images that support Log Analytics agent to add to audit scope",
           "description": "A semicolon-separated list of images; Ex: /subscriptions/<subscriptionId>/resourceGroups/YourResourceGroup/providers/Microsoft.Compute/images/ContosoStdImage"
@@ -65,7 +65,7 @@
         "defaultValue": []
       },
       "javaLatestVersionForAppServices": {
-        "type": "string",
+        "type": "String",
         "defaultValue": "11",
         "metadata": {
           "displayName": "Latest Java version",
@@ -73,7 +73,7 @@
         }
       },
       "windowsPythonLatestVersionForAppServices": {
-        "type": "string",
+        "type": "String",
         "defaultValue": "3.6",
         "metadata": {
           "displayName": "Latest Windows Python version",
@@ -81,7 +81,7 @@
         }
       },
       "linuxPythonLatestVersionForAppServices": {
-        "type": "string",
+        "type": "String",
         "defaultValue": "3.8",
         "metadata": {
           "displayName": "Latest Linux Python version",
@@ -89,7 +89,7 @@
         }
       },
       "listOfResourceTypesForDiagnosticLogs": {
-        "type": "array",
+        "type": "Array",
         "defaultValue": [
           "Microsoft.AnalysisServices/servers",
           "Microsoft.ApiManagement/service",
@@ -192,7 +192,7 @@
         }
       },
       "minimumTLSVersionForWindowsServers": {
-        "type": "string",
+        "type": "String",
         "defaultValue": "1.2",
         "allowedValues": [
           "1.2"

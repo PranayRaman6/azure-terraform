@@ -57,7 +57,7 @@ module "enterprise_scale" {
     ycc-management = {
       display_name               = "YCC Management"
       parent_management_group_id = "${local.root_id}-platform"
-      subscription_ids           = []
+      subscription_ids           = var.management_subscriptions
 
       archetype_config = {
         archetype_id   = "ycc_platform"
@@ -74,6 +74,22 @@ module "enterprise_scale" {
       archetype_config = {
         archetype_id   = "ycc_landing_zone"
         parameters     = {}
+        access_control = {}
+      }
+    }
+
+    ycc-secure-research = {
+      display_name               = "YCC Secure Research"
+      parent_management_group_id = "${local.root_id}-landing-zones"
+      subscription_ids           = var.secure_research_subscriptions
+
+      archetype_config = {
+        archetype_id   = "ycc_secure_research"
+        parameters     = {
+          YCC-Audit-NIST-800-171 = {
+            logAnalyticsWorkspaceIDForVMAgents = "d6496211-ccd8-406a-9125-5b910da8a301"
+          }
+        }
         access_control = {}
       }
     }

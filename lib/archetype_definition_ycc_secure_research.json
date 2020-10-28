@@ -1,0 +1,14 @@
+{
+  "ycc_secure_research": {
+    "policy_assignments": [
+      "YCC-Audit-NIST-800-171"
+    ],
+    "policy_definitions": [],
+    "policy_set_definitions": [],
+    "role_definitions": [],
+    "archetype_config": {
+      "parameters": {},
+      "access_control": {}
+    }
+  }
+}
