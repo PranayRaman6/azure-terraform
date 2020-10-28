@@ -19,7 +19,7 @@ module "enterprise_scale" {
 
   custom_landing_zones = {
     ycc-platform = {
-      display_name               = "YCC Core"
+      display_name               = "YCC Platform"
       parent_management_group_id = local.root_id
       subscription_ids           = []
 
@@ -67,7 +67,7 @@ module "enterprise_scale" {
     }
 
     ycc-landing-zones = {
-      display_name               = "YCC Baseline"
+      display_name               = "YCC Landing Zones"
       parent_management_group_id = local.root_id
       subscription_ids           = []
 
