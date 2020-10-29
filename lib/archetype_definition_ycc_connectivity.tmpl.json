@@ -1,0 +1,14 @@
+{
+  "ycc_connectivity": {
+    "policy_assignments": [
+      "YCC-Deploy-vWAN"
+    ],
+    "policy_definitions": [],
+    "policy_set_definitions": [],
+    "role_definitions": [],
+    "archetype_config": {
+      "parameters": {},
+      "access_control": {}
+    }
+  }
+}

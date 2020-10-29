@@ -16,6 +16,7 @@ module "enterprise_scale" {
   deploy_core_landing_zones = true               // Control whether to deploy the default core landing zones // default = true
   deploy_demo_landing_zones = false              // Control whether to deploy the demo landing zones (default = false)
   library_path              = "${path.root}/lib" // This string variable is used to define the location of your custom library
+  default_location          = local.default_location
 
   custom_landing_zones = {
     ycc-platform = {
@@ -36,7 +37,7 @@ module "enterprise_scale" {
       subscription_ids           = []
 
       archetype_config = {
-        archetype_id   = "ycc_platform"
+        archetype_id   = "ycc_identity"
         parameters     = {}
         access_control = {}
       }
@@ -45,11 +46,17 @@ module "enterprise_scale" {
     ycc-connectivity = {
       display_name               = "YCC Connectivity"
       parent_management_group_id = "${local.root_id}-platform"
-      subscription_ids           = []
+      subscription_ids           = var.management_subscriptions
 
       archetype_config = {
-        archetype_id   = "ycc_platform"
-        parameters     = {}
+        archetype_id = "ycc_connectivity"
+        parameters = {
+          YCC-Deploy-vWAN = {
+            vwanname   = "vwan-ycc-global"
+            vwanRegion = "westus2"
+            rgName     = "rg-ycc-network"
+          }
+        }
         access_control = {}
       }
     }
@@ -57,10 +64,10 @@ module "enterprise_scale" {
     ycc-management = {
       display_name               = "YCC Management"
       parent_management_group_id = "${local.root_id}-platform"
-      subscription_ids           = var.management_subscriptions
+      subscription_ids           = []
 
       archetype_config = {
-        archetype_id   = "ycc_platform"
+        archetype_id   = "ycc_management"
         parameters     = {}
         access_control = {}
       }
@@ -72,7 +79,7 @@ module "enterprise_scale" {
       subscription_ids           = []
 
       archetype_config = {
-        archetype_id   = "ycc_landing_zone"
+        archetype_id   = "ycc_landing_zones"
         parameters     = {}
         access_control = {}
       }
@@ -100,7 +107,7 @@ module "enterprise_scale" {
       subscription_ids           = []
 
       archetype_config = {
-        archetype_id   = "ycc_sandbox"
+        archetype_id   = "ycc_sandboxes"
         parameters     = {}
         access_control = {}
       }
@@ -149,6 +156,7 @@ module "enterprise_scale" {
       parameters = {
         ES-Allowed-Locations = {
           listOfAllowedLocations = [
+            "global",
             "westus2",
             "westcentralus"
           ]
@@ -156,6 +164,7 @@ module "enterprise_scale" {
 
         ES-Allowed-RSG-Locations = {
           listOfAllowedLocations = [
+            "global",
             "westus2",
             "westcentralus"
           ]
@@ -163,5 +172,40 @@ module "enterprise_scale" {
       }
       access_control = {}
     }
+    # decommissioned = {
+    #   archetype_id   = "ycc_decommissioned"
+    #   parameters     = {}
+    #   access_control = {}
+    # }
+    # sandboxes = {
+    #   archetype_id   = "ycc_sandboxes"
+    #   parameters     = {}
+    #   access_control = {}
+    # }
+    # landing_zones = {
+    #   archetype_id   = "ycc_landing_zones"
+    #   parameters     = {}
+    #   access_control = {}
+    # }
+    # platform = {
+    #   archetype_id   = "ycc_platform"
+    #   parameters     = {}
+    #   access_control = {}
+    # }
+    # connectivity = {
+    #   archetype_id   = "ycc_connectivity"
+    #   parameters     = {}
+    #   access_control = {}
+    # }
+    # management = {
+    #   archetype_id   = "ycc_management"
+    #   parameters     = {}
+    #   access_control = {}
+    # }
+    # identity = {
+    #   archetype_id   = "ycc_identity"
+    #   parameters     = {}
+    #   access_control = {}
+    # }
   }
 }
