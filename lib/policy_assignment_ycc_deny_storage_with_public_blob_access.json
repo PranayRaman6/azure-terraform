@@ -8,7 +8,7 @@
     "notScopes": [],
     "parameters": {
       "effect": {
-        "value": "Deny"
+        "value": "Audit"
       }
     },
     "policyDefinitionId": "${root_scope_resource_id}/providers/Microsoft.Authorization/policyDefinitions/YCC-Audit-Storage-With-Public-Blob-Access",

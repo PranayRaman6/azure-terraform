@@ -156,17 +156,23 @@ module "enterprise_scale" {
       parameters = {
         ES-Allowed-Locations = {
           listOfAllowedLocations = [
+            "centralus",
             "global",
-            "westus2",
-            "westcentralus"
+            "southcentralus",
+            "westcentralus",
+            "westus",
+            "westus2"
           ]
         }
 
         ES-Allowed-RSG-Locations = {
           listOfAllowedLocations = [
+            "centralus",
             "global",
-            "westus2",
-            "westcentralus"
+            "southcentralus",
+            "westcentralus",
+            "westus",
+            "westus2"
           ]
         }
       }
