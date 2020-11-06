@@ -28,10 +28,11 @@
 1. Initialize against Terraform Cloud using the command:
     `terraform init`
     
-1. Plan and deploy
+1. Plan, deploy, and destroy
 
-    `terraform plan`
-    `terraform apply`
+    - `terraform plan`
+    - `terraform apply`
+    - `terraform destroy`
 
 ## Get started with GitHub Actions
 
