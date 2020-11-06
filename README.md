@@ -6,6 +6,8 @@
 
 1. Setup your workspace on [Terraform Cloud](https://app.terraform.io)
 
+    > You have the option to use Version Control as the trigger or CLI-based. If you implement VCS, there is no need to configure GitHub Actions (as documented below) since Terraform Cloud will "listen" to your repo.
+
 1. Create a service principal in Azure and add the following keys to the workspace's environment variables
 
     - ARM_CLIENT_ID
@@ -38,6 +40,6 @@
 
 ## Use this doc and get your Terraform on!
 
-https://www.terraform.io/docs/providers/azurerm/
-https://registry.terraform.io/modules/Azure/caf-enterprise-scale/azurerm/latest
-https://github.com/Azure/terraform-azurerm-caf-enterprise-scale
+- https://www.terraform.io/docs/providers/azurerm/
+- https://registry.terraform.io/modules/Azure/caf-enterprise-scale/azurerm/latest
+- https://github.com/Azure/terraform-azurerm-caf-enterprise-scale
