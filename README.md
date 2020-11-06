@@ -27,6 +27,11 @@
 
 1. Initialize against Terraform Cloud using the command:
     `terraform init`
+    
+1. Plan and deploy
+
+    `terraform plan`
+    `terraform apply`
 
 ## Get started with GitHub Actions
 
