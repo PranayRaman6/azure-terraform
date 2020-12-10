@@ -5,7 +5,7 @@ provider "azurerm" {
 
 module "enterprise_scale" {
   source  = "Azure/caf-enterprise-scale/azurerm"
-  version = "0.0.6-preview"
+  version = "0.0.7-preview"
 
   # Mandatory Variables
   root_parent_id = var.tenant_id
